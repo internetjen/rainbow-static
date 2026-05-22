@@ -9,17 +9,28 @@ import Navbar from '../components/Navbar.astro';
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <title>{title}</title>
-
-    <!-- Google Fonts: Space Grotesk for headings, Inter for body text
-         We load both from Google's CDN so no install is needed -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Space+Grotesk:wght@500;700;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@900&family=Inter:wght@400;500&family=Space+Grotesk:wght@500;700;900&display=swap" rel="stylesheet" />
   </head>
 
   <body>
     <Navbar />
-    <slot />
+
+    <!-- The Hero needs to be full-bleed (edge to edge), so it lives OUTSIDE the wrapper.
+         We use Astro's named slots to pull it out separately. -->
+    <slot name="hero" />
+    <slot name="header" />  <!--  slot for full-width page headers -->
+
+
+    <!-- Everything else (page content) goes inside this centered wrapper.
+         max-width caps how wide it gets on large screens.
+         margin: 0 auto centers it horizontally.
+         padding adds breathing room on small screens so content doesn't touch the edges. -->
+    <main class="page-wrapper">
+      <slot />
+    </main>
+
     <footer>
       <p>Made with 🏳️‍🌈 by internetjen</p>
     </footer>
@@ -27,23 +38,19 @@ import Navbar from '../components/Navbar.astro';
 </html>
 
 <style>
-  /* Apply base styles to everything */
   * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
   }
 
-  /* CSS custom properties (variables) for our palette.
-     Defining them on :root means every file on the site can use them.
-     If we ever want to tweak a color, we change it once here. */
   :root {
-    --color-bg:       #f5f0eb; /* Warm cream — page background */
-    --color-surface:  #ffffff; /* White — cards, navbar */
-    --color-border:   #e0d8d0; /* Soft warm gray — borders */
-    --color-text:     #1a1a1a; /* Near black — primary text */
-    --color-muted:    #8a8070; /* Warm gray — secondary text */
-    --color-accent:   #ff3d7f; /* Vivid pink — buttons, highlights */
+    --color-bg:       #f5f0eb;
+    --color-surface:  #ffffff;
+    --color-border:   #e0d8d0;
+    --color-text:     #1a1a1a;
+    --color-muted:    #8a8070;
+    --color-accent:   #ff3d7f;
     --font-heading:   'Space Grotesk', sans-serif;
     --font-body:      'Inter', sans-serif;
   }
@@ -52,6 +59,15 @@ import Navbar from '../components/Navbar.astro';
     font-family: var(--font-body);
     background-color: var(--color-bg);
     color: var(--color-text);
+  }
+
+  /* This wrapper constrains and centers all page content.
+     The Hero is excluded because it needs to be full-width. */
+  .page-wrapper {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 2rem; /* Side padding so content doesn't touch screen edges on mobile */
+    position: relative; /* Establishes a new stacking context for the Hero's absolute positioning */
   }
 
   footer {

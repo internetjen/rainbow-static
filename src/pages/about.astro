@@ -1,18 +1,19 @@
 ---
 // about.astro — the About page
-// A simple page explaining what Rainbow Static is.
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title="About — Rainbow Static">
 
+  <!-- Page header with dark background bar -->
+  <div class="page-header" slot="header">
     <div class="page-header-content">
       <h1>About</h1>
     </div>
   </div>
 
   <!-- About content -->
-  <main>
+  <div class="about-section">
     <div class="about-content">
 
       <p>
@@ -43,54 +44,54 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       </p>
 
     </div>
-  </main>
+  </div>
 
 </BaseLayout>
 
 <style>
-  /* Same page header styles as shows.astro */
+  /* Dark header bar — uses site variables instead of hardcoded colors */
   .page-header {
-    background-color: #111111;
-    border-bottom: 1px solid #222;
+    background-color: var(--color-text);
+    border-bottom: 1px solid var(--color-border);
   }
 
-  .page-header-content {
-    padding: 2rem;
-  }
+ .page-header-content {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+}
 
   .page-header-content h1 {
     font-size: 2rem;
     font-weight: 800;
-    color: #ffffff;
+    color: var(--color-bg); /* Light text on dark background */
   }
 
-  /* ============================================
-     ABOUT CONTENT
-     Max width keeps long text readable —
-     lines that are too wide are hard to read
-  ============================================ */
-  main {
-    padding: 2rem;
+  /* Wrapper for the about body content */
+  .about-section {
+    padding: 2rem 0; /* No side padding — page-wrapper in BaseLayout handles that */
   }
 
   .about-content {
     max-width: 680px;     /* Constrains line length for readability */
+    margin: 0 auto;      /* Centers the content */
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;          /* Space between each paragraph/section */
+    gap: 1.5rem;
   }
 
   .about-content p {
     font-size: 1rem;
-    color: #cccccc;
-    line-height: 1.7;     /* Generous line height makes text easier to read */
+    color: var(--color-text);
+    line-height: 1.7;
   }
 
   .about-content h2 {
     font-size: 1.2rem;
-    color: #ffffff;
+    color: var(--color-text);
     padding-left: 1rem;
-    border-left: 4px solid #ff69b4; /* Same pink accent as the shows page */
+    border-left: 4px solid var(--color-accent);
+    border-radius: 0;
   }
 
   .about-content ul {
@@ -101,18 +102,18 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     padding-left: 1rem;
   }
 
-  /* Custom bullet using ::before pseudo-element */
+  /* Arrow bullet using ::before pseudo-element */
   .about-content ul li::before {
-    content: "→ ";        /* Arrow instead of a default bullet */
-    color: #ff69b4;
+    content: "→ ";
+    color: var(--color-accent);
   }
 
   .about-content ul li {
-    color: #cccccc;
+    color: var(--color-text);
     font-size: 0.95rem;
   }
 
   .about-content strong {
-    color: #ffffff;
+    color: var(--color-text);
   }
 </style>

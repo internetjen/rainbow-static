@@ -3,6 +3,8 @@
 ---
 
 <section class="hero">
+  <!-- The 7 colored bars that create the SMPTE color bar pattern -->
+  <!-- These are blurred heavily to create the soft rainbow gradient look -->
   <div class="smpte-bars">
     <span></span>
     <span></span>
@@ -13,36 +15,47 @@
     <span></span>
   </div>
 
+  <!-- A transparent layer sitting on top of the bars -->
+  <!-- It adds grain texture via an inline SVG noise filter -->
   <div class="smpte-overlay"></div>
 
+  <!-- Animated scanlines layer — horizontal lines that scroll downward -->
+  <!-- Mimics the look of an old CRT/TV screen -->
+  <div class="scanlines"></div>
+
+  <!-- The actual text content, sits on top of all the background layers -->
   <div class="hero-content">
     <h1>Rainbow Static</h1>
     <p class="tagline">Your one stop shop for WLW content</p>
-    <a href="/shows" class="cta-button">Browse All Content</a>
+    <a href="/content" class="cta-button">Browse All Content</a>
   </div>
 </section>
 
 <style>
   .hero {
-    position: relative;
+    position: relative;        /* Needed so all absolute children position relative to this */
     width: 100%;
     height: 85vh;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
+    align-items: center;       /* Vertically center the hero content */
+    justify-content: center;   /* Horizontally center the hero content */
+    overflow: hidden;          /* Clips the scaled-up bars so they don't spill outside */
   }
 
+  /* ---- LAYER 1: SMPTE color bars (the rainbow gradient background) ---- */
   .smpte-bars {
-    position: absolute;
+    position: absolute;        /* Pulled out of normal flow, fills the whole hero */
     top: 0; left: 0;
     width: 100%; height: 100%;
-    display: flex;
-    filter: blur(40px);
-    transform: scale(1.2);
+    display: flex;             /* Lays the 7 color spans out side by side */
+    filter: blur(40px);        /* Heavy blur turns sharp bars into a soft gradient */
+    transform: scale(1.2);     /* Scales up slightly so blurred edges don't show white gaps */
   }
 
+  /* Each span is one color bar — flex: 1 makes them all equal width */
   .smpte-bars span { flex: 1; }
+
+  /* Classic SMPTE color bar order: gray, yellow, cyan, green, magenta, red, blue */
   .smpte-bars span:nth-child(1) { background-color: #c0c0c0; }
   .smpte-bars span:nth-child(2) { background-color: #c0c000; }
   .smpte-bars span:nth-child(3) { background-color: #00c0c0; }
@@ -51,20 +64,56 @@
   .smpte-bars span:nth-child(6) { background-color: #c00000; }
   .smpte-bars span:nth-child(7) { background-color: #0000c0; }
 
-  /* Lighter overlay than before — lets more color show through
-     since we're on a light-themed site now */
+  /* ---- LAYER 2: Grain/noise overlay ---- */
   .smpte-overlay {
     position: absolute;
     top: 0; left: 0;
     width: 100%; height: 100%;
-    background-color: rgba(245, 240, 235, 0.15); /* Warm cream tint */
+
+    /* A faint warm cream tint to soften the raw colors slightly */
+    background-color: rgba(245, 240, 235, 0.15);
+
+    /* An inline SVG noise filter tiled across the whole surface */
+    /* feTurbulence generates the grainy static texture */
+    /* baseFrequency controls grain size — higher = finer grain */
+    /* stitchTiles="stitch" makes the tiles seamless */
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
-    background-size: 128px 128px;
+    background-size: 128px 128px; /* Tile size — smaller = more repetitions = finer texture */
   }
 
+  /* ---- LAYER 3: Scanlines ---- */
+  .scanlines {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;      /* Lets clicks pass through to content below */
+
+    /* Creates repeating horizontal lines using a CSS gradient */
+    /* The pattern: a semi-transparent black stripe, then a transparent gap */
+    /* background-size height controls the gap between lines */
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.08) 0px,   /* Start of dark stripe */
+      rgba(0, 0, 0, 0.08) 1px,   /* End of dark stripe (1px tall) */
+      transparent 1px,            /* Start of transparent gap */
+      transparent 3px             /* End of gap — so each line is every 3px */
+    );
+
+    /* Animates the scanlines scrolling downward for the CRT TV effect */
+    animation: scanline-scroll 8s linear infinite;
+  }
+
+  /* Moves the scanline pattern downward by one full tile (3px) */
+  /* Because the gradient repeats, this looks like continuous scrolling */
+  @keyframes scanline-scroll {
+    from { background-position: 0 0; }
+    to   { background-position: 0 3px; }
+  }
+
+  /* ---- LAYER 4: Hero text content (sits above all background layers) ---- */
   .hero-content {
-    position: relative;
-    z-index: 1;
+    position: relative;        /* z-index only works on positioned elements */
+    z-index: 1;                /* Ensures text sits above all the absolute layers */
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -72,19 +121,21 @@
     gap: 1.5rem;
   }
 
-  /* Space Grotesk gives the title a bold modern feel */
   .hero-content h1 {
-    font-family: var(--font-heading);
-    font-size: clamp(3rem, 8vw, 6rem);
+    font-family: 'Unbounded', sans-serif;  /* The chunky display font we imported */
+    font-size: clamp(3rem, 8vw, 6rem);    /* Fluid sizing: min 3rem, scales with viewport, max 6rem */
     font-weight: 900;
     color: #ffffff;
-    letter-spacing: -0.03em;
-    text-shadow: 0 2px 30px rgba(0, 0, 0, 0.3);
+    letter-spacing: -0.03em;              /* Tightens spacing — looks better at large sizes */
+    /* text-shadow adds depth so the white text reads clearly over the bright gradient */
+    text-shadow:
+      0 2px 30px rgba(0, 0, 0, 0.3),     /* Soft diffuse shadow for depth */
+      0 0 80px rgba(0, 0, 0, 0.2);       /* Wide glow to separate text from background */
     line-height: 1;
   }
 
   .tagline {
-    font-family: var(--font-body);
+    font-family: 'Space Grotesk', sans-serif;
     font-size: clamp(1rem, 2.5vw, 1.2rem);
     color: rgba(255, 255, 255, 0.9);
     text-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
@@ -95,19 +146,19 @@
     display: inline-block;
     margin-top: 0.5rem;
     padding: 0.85rem 2rem;
-    background-color: var(--color-accent);
+    background-color: var(--color-accent);  /* Uses your site's accent color CSS variable */
     color: #ffffff;
-    font-family: var(--font-body);
+    font-family: 'Space Grotesk', sans-serif;
     font-weight: 500;
     font-size: 0.95rem;
     text-decoration: none;
-    border-radius: 999px;
+    border-radius: 999px;                   /* Large value = fully pill-shaped button */
     letter-spacing: 0.02em;
-    transition: transform 0.2s, opacity 0.2s;
+    transition: transform 0.2s, opacity 0.2s;  /* Smooth hover animation */
   }
 
   .cta-button:hover {
     opacity: 0.9;
-    transform: translateY(-2px);
+    transform: translateY(-2px);  /* Subtle lift effect on hover */
   }
 </style>

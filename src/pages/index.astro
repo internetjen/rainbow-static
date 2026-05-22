@@ -1,28 +1,24 @@
 ---
-// index.astro — the homepage of Rainbow Static
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/Hero.astro';
-import ShowCard from '../components/ShowCard.astro';
-import { shows } from '../data/shows.js';
+import ContentCard from '../components/ContentCard.astro';
+import { manualContent } from '../data/content.js';
 
-// Grab just the first 3 shows from the data file for the featured section
-// slice(0, 3) returns a new array with only the first 3 items
-const featuredShows = shows.slice(0, 3);
+const featuredContent = manualContent.slice(0, 3);
 ---
 
 <BaseLayout title="Rainbow Static — WLW Shows">
 
-  <!-- Big hero banner at the top -->
-  <Hero />
+  <!-- slot="hero" tells BaseLayout to place this OUTSIDE the centered wrapper -->
+  <!-- so it stays full-bleed edge to edge -->
+  <Hero slot="hero" />
 
-  <!-- Featured shows section below the hero -->
+  <!-- Everything below goes into the default slot, inside .page-wrapper -->
   <section class="featured">
-    <h2 class="section-title">Featured Shows</h2>
-
-    <!-- Grid of the first 3 shows -->
+    <h2 class="section-title">Featured Content</h2>
     <div class="grid">
-      {featuredShows.map((show) => (
-        <ShowCard {...show} />
+      {featuredContent.map((item) => (
+        <ContentCard {...item} />
       ))}
     </div>
   </section>
@@ -30,23 +26,23 @@ const featuredShows = shows.slice(0, 3);
 </BaseLayout>
 
 <style>
-  .featured {
-    padding: 3rem 2rem;
-  }
 
-  /* Section heading with a pink left border accent */
-  .section-title {
+ .featured {
+    padding: 3rem 0; /* this was missing — adds space above and below the section */
+  }
+.section-title {
     font-size: 1.5rem;
     margin-bottom: 1.5rem;
-    color: #ffffff;
+    color: #1a1a1a;
     padding-left: 1rem;
-    border-left: 4px solid #ff69b4; /* Pink left border accent */
+    border-left: 4px solid #ff69b4;
+    border-radius: 0;
   }
 
-  /* Responsive grid — same as before */
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1.5rem;
-  }
+   .grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
 </style>

@@ -29,18 +29,21 @@
   </button>
 
   <ul class="nav-links">
-    <li><a href="/shows">All Content</a></li>
+    <li><a href="/content">All Content</a></li>
     <li><a href="/about">About</a></li>
   </ul>
 </nav>
 
 <script>
   const hamburger = document.querySelector('.hamburger');
-  const navLinks = document.querySelector('.nav-links');
+const navLinks = document.querySelector('.nav-links');
+
+if (hamburger && navLinks) {
   hamburger.addEventListener('click', () => {
     navLinks.classList.toggle('open');
     hamburger.classList.toggle('open');
   });
+}
 </script>
 
 <style>
