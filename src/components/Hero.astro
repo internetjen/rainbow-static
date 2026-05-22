@@ -1,0 +1,113 @@
+---
+// Hero.astro
+---
+
+<section class="hero">
+  <div class="smpte-bars">
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+
+  <div class="smpte-overlay"></div>
+
+  <div class="hero-content">
+    <h1>Rainbow Static</h1>
+    <p class="tagline">Your one stop shop for WLW content</p>
+    <a href="/shows" class="cta-button">Browse All Content</a>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    width: 100%;
+    height: 85vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .smpte-bars {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: flex;
+    filter: blur(40px);
+    transform: scale(1.2);
+  }
+
+  .smpte-bars span { flex: 1; }
+  .smpte-bars span:nth-child(1) { background-color: #c0c0c0; }
+  .smpte-bars span:nth-child(2) { background-color: #c0c000; }
+  .smpte-bars span:nth-child(3) { background-color: #00c0c0; }
+  .smpte-bars span:nth-child(4) { background-color: #00c000; }
+  .smpte-bars span:nth-child(5) { background-color: #c000c0; }
+  .smpte-bars span:nth-child(6) { background-color: #c00000; }
+  .smpte-bars span:nth-child(7) { background-color: #0000c0; }
+
+  /* Lighter overlay than before — lets more color show through
+     since we're on a light-themed site now */
+  .smpte-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(245, 240, 235, 0.15); /* Warm cream tint */
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
+    background-size: 128px 128px;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  /* Space Grotesk gives the title a bold modern feel */
+  .hero-content h1 {
+    font-family: var(--font-heading);
+    font-size: clamp(3rem, 8vw, 6rem);
+    font-weight: 900;
+    color: #ffffff;
+    letter-spacing: -0.03em;
+    text-shadow: 0 2px 30px rgba(0, 0, 0, 0.3);
+    line-height: 1;
+  }
+
+  .tagline {
+    font-family: var(--font-body);
+    font-size: clamp(1rem, 2.5vw, 1.2rem);
+    color: rgba(255, 255, 255, 0.9);
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
+    letter-spacing: 0.02em;
+  }
+
+  .cta-button {
+    display: inline-block;
+    margin-top: 0.5rem;
+    padding: 0.85rem 2rem;
+    background-color: var(--color-accent);
+    color: #ffffff;
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 0.95rem;
+    text-decoration: none;
+    border-radius: 999px;
+    letter-spacing: 0.02em;
+    transition: transform 0.2s, opacity 0.2s;
+  }
+
+  .cta-button:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+  }
+</style>

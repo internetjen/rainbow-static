@@ -1,0 +1,74 @@
+---
+const { title, year, country, platform, status, image, description } = Astro.props;
+---
+
+<div class="card">
+  <img src={image} alt={`Poster for ${title}`} />
+  <div class="card-info">
+    <h2>{title}</h2>
+    <p class="meta">{year} · {country} · {platform}</p>
+    <span class="badge">{status}</span>
+    <p class="description">{description}</p>
+  </div>
+</div>
+
+<style>
+  .card {
+    background-color: var(--color-surface);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    /* Subtle lift on hover — gives a modern interactive feel */
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(26, 26, 26, 0.1);
+  }
+
+  img {
+    width: 100%;
+    aspect-ratio: 2/3;
+    object-fit: cover;
+  }
+
+  .card-info {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  h2 {
+    font-family: var(--font-heading);
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+
+  .meta {
+    font-size: 0.78rem;
+    color: var(--color-muted);
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    background-color: #fff0f4; /* Light pink surface */
+    color: var(--color-accent);
+    font-weight: 500;
+    width: fit-content;
+    border: 1px solid #ffd0de;
+  }
+
+  .description {
+    font-size: 0.82rem;
+    color: var(--color-muted);
+    line-height: 1.5;
+  }
+</style>

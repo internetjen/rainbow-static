@@ -1,0 +1,180 @@
+---
+// Navbar.astro
+---
+
+<nav>
+  <a href="/" class="nav-logo">
+    <!-- Mini SMPTE icon — a small color bar block next to the title -->
+    <div class="mini-smpte">
+      <div class="mini-smpte-bars">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <!-- Black bottom bar mimics a real SMPTE test card -->
+      <div class="mini-smpte-bottom"></div>
+    </div>
+    <!-- Logo text — "STATIC" gets the pink accent color -->
+    <span class="logo-text">RAINBOW<span class="accent">STATIC</span></span>
+  </a>
+
+  <button class="hamburger" aria-label="Toggle navigation">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+  <ul class="nav-links">
+    <li><a href="/shows">All Content</a></li>
+    <li><a href="/about">About</a></li>
+  </ul>
+</nav>
+
+<script>
+  const hamburger = document.querySelector('.hamburger');
+  const navLinks = document.querySelector('.nav-links');
+  hamburger.addEventListener('click', () => {
+    navLinks.classList.toggle('open');
+    hamburger.classList.toggle('open');
+  });
+</script>
+
+<style>
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+    height: 68px;
+    background-color: var(--color-bg);
+    border-bottom: 2px solid var(--color-text);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  /* Logo wraps the icon + text as a single clickable link */
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+
+  /* Mini SMPTE icon container */
+  .mini-smpte {
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    border: 1px solid var(--color-border);
+  }
+
+  /* The 7 color bars inside the icon */
+  .mini-smpte-bars {
+    display: flex;
+    flex: 1;
+  }
+
+  .mini-smpte-bars span { flex: 1; }
+  .mini-smpte-bars span:nth-child(1) { background-color: #c0c0c0; }
+  .mini-smpte-bars span:nth-child(2) { background-color: #c0c000; }
+  .mini-smpte-bars span:nth-child(3) { background-color: #00c0c0; }
+  .mini-smpte-bars span:nth-child(4) { background-color: #00c000; }
+  .mini-smpte-bars span:nth-child(5) { background-color: #c000c0; }
+  .mini-smpte-bars span:nth-child(6) { background-color: #c00000; }
+  .mini-smpte-bars span:nth-child(7) { background-color: #0000c0; }
+
+  /* Black bottom strip on the icon — mimics a real test card */
+  .mini-smpte-bottom {
+    height: 8px;
+    background-color: #1a1a1a;
+  }
+
+  /* Logo text */
+  .logo-text {
+    font-family: var(--font-heading);
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--color-text);
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+
+  /* Pink accent on "STATIC" */
+  .accent {
+    color: var(--color-accent);
+  }
+
+  /* Nav links */
+  .nav-links {
+    display: flex;
+    gap: 1.5rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--color-muted);
+    text-decoration: none;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover {
+    color: var(--color-accent);
+  }
+
+  /* Hamburger — hidden on desktop */
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+  }
+
+  .hamburger span {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background-color: var(--color-text);
+    transition: all 0.3s;
+  }
+
+  @media (max-width: 768px) {
+    .hamburger { display: flex; }
+
+    .nav-links {
+      display: none;
+      flex-direction: column;
+      gap: 0;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background-color: var(--color-bg);
+      border-bottom: 2px solid var(--color-text);
+      padding: 1rem 0;
+    }
+
+    .nav-links.open { display: flex; }
+    .nav-links li { padding: 0.75rem 2rem; }
+
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+  }
+</style>

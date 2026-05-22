@@ -1,11 +1,52 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+// index.astro — the homepage of Rainbow Static
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import ShowCard from '../components/ShowCard.astro';
+import { shows } from '../data/shows.js';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+// Grab just the first 3 shows from the data file for the featured section
+// slice(0, 3) returns a new array with only the first 3 items
+const featuredShows = shows.slice(0, 3);
 ---
 
-<Layout>
-	<Welcome />
-</Layout>
+<BaseLayout title="Rainbow Static — WLW Shows">
+
+  <!-- Big hero banner at the top -->
+  <Hero />
+
+  <!-- Featured shows section below the hero -->
+  <section class="featured">
+    <h2 class="section-title">Featured Shows</h2>
+
+    <!-- Grid of the first 3 shows -->
+    <div class="grid">
+      {featuredShows.map((show) => (
+        <ShowCard {...show} />
+      ))}
+    </div>
+  </section>
+
+</BaseLayout>
+
+<style>
+  .featured {
+    padding: 3rem 2rem;
+  }
+
+  /* Section heading with a pink left border accent */
+  .section-title {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: #ffffff;
+    padding-left: 1rem;
+    border-left: 4px solid #ff69b4; /* Pink left border accent */
+  }
+
+  /* Responsive grid — same as before */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+  }
+</style>

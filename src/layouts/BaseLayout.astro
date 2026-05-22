@@ -1,0 +1,66 @@
+---
+const { title } = Astro.props;
+import Navbar from '../components/Navbar.astro';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>{title}</title>
+
+    <!-- Google Fonts: Space Grotesk for headings, Inter for body text
+         We load both from Google's CDN so no install is needed -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Space+Grotesk:wght@500;700;900&display=swap" rel="stylesheet" />
+  </head>
+
+  <body>
+    <Navbar />
+    <slot />
+    <footer>
+      <p>Made with 🏳️‍🌈 by internetjen</p>
+    </footer>
+  </body>
+</html>
+
+<style>
+  /* Apply base styles to everything */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  /* CSS custom properties (variables) for our palette.
+     Defining them on :root means every file on the site can use them.
+     If we ever want to tweak a color, we change it once here. */
+  :root {
+    --color-bg:       #f5f0eb; /* Warm cream — page background */
+    --color-surface:  #ffffff; /* White — cards, navbar */
+    --color-border:   #e0d8d0; /* Soft warm gray — borders */
+    --color-text:     #1a1a1a; /* Near black — primary text */
+    --color-muted:    #8a8070; /* Warm gray — secondary text */
+    --color-accent:   #ff3d7f; /* Vivid pink — buttons, highlights */
+    --font-heading:   'Space Grotesk', sans-serif;
+    --font-body:      'Inter', sans-serif;
+  }
+
+  body {
+    font-family: var(--font-body);
+    background-color: var(--color-bg);
+    color: var(--color-text);
+  }
+
+  footer {
+    text-align: center;
+    padding: 2rem;
+    margin-top: 2rem;
+    border-top: 1px solid var(--color-border);
+    font-size: 0.85rem;
+    color: var(--color-muted);
+    font-family: var(--font-body);
+  }
+</style>

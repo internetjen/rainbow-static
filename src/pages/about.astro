@@ -1,0 +1,118 @@
+---
+// about.astro — the About page
+// A simple page explaining what Rainbow Static is.
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="About — Rainbow Static">
+
+    <div class="page-header-content">
+      <h1>About</h1>
+    </div>
+  </div>
+
+  <!-- About content -->
+  <main>
+    <div class="about-content">
+
+      <p>
+        <strong>Rainbow Static</strong> is a community resource for anyone looking
+        to find shows, series, and web series that feature WLW (women who love women)
+        relationships — whether they're the main couple or a beloved side pairing.
+      </p>
+
+      <p>
+        The name is a nod to the classic SMPTE color bars — the rainbow test pattern
+        that appears on screens before a broadcast begins. We like to think of this
+        site the same way: a signal that something good is about to start.
+      </p>
+
+      <h2>What you'll find here</h2>
+      <ul>
+        <li>Thai GL series</li>
+        <li>Korean dramas with WLW storylines</li>
+        <li>Western series and web series</li>
+        <li>Anime and animated content</li>
+        <li>And more as the library grows</li>
+      </ul>
+
+      <h2>Built by</h2>
+      <p>
+        Made with 🏳️‍🌈 by <strong>internetjen</strong> as a passion project
+        for the WLW community.
+      </p>
+
+    </div>
+  </main>
+
+</BaseLayout>
+
+<style>
+  /* Same page header styles as shows.astro */
+  .page-header {
+    background-color: #111111;
+    border-bottom: 1px solid #222;
+  }
+
+  .page-header-content {
+    padding: 2rem;
+  }
+
+  .page-header-content h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #ffffff;
+  }
+
+  /* ============================================
+     ABOUT CONTENT
+     Max width keeps long text readable —
+     lines that are too wide are hard to read
+  ============================================ */
+  main {
+    padding: 2rem;
+  }
+
+  .about-content {
+    max-width: 680px;     /* Constrains line length for readability */
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;          /* Space between each paragraph/section */
+  }
+
+  .about-content p {
+    font-size: 1rem;
+    color: #cccccc;
+    line-height: 1.7;     /* Generous line height makes text easier to read */
+  }
+
+  .about-content h2 {
+    font-size: 1.2rem;
+    color: #ffffff;
+    padding-left: 1rem;
+    border-left: 4px solid #ff69b4; /* Same pink accent as the shows page */
+  }
+
+  .about-content ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-left: 1rem;
+  }
+
+  /* Custom bullet using ::before pseudo-element */
+  .about-content ul li::before {
+    content: "→ ";        /* Arrow instead of a default bullet */
+    color: #ff69b4;
+  }
+
+  .about-content ul li {
+    color: #cccccc;
+    font-size: 0.95rem;
+  }
+
+  .about-content strong {
+    color: #ffffff;
+  }
+</style>
