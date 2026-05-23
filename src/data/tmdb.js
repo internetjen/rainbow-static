@@ -26,6 +26,11 @@ export async function fetchShow(id) {
   const res = await fetch(`${BASE_URL}/tv/${id}?api_key=${API_KEY}`, options);
   const data = await res.json();
 
+  // TMDB returns { success: false, status_message: "..." } on errors
+  if (!res.ok || data.success === false) {
+    console.error(`Failed to fetch show ${id}:`, data.status_message ?? res.status);
+    return null;
+  }
 
   // Map TMDB's field names to match our content.js shape
   // so the rest of the app doesn't need to know about TMDB's structure
@@ -40,8 +45,8 @@ export async function fetchShow(id) {
     genre: data.genres?.map(g => g.name) ?? [],
     image: data.poster_path ? `${IMAGE_BASE}${data.poster_path}` : null,
     description: data.overview,
-    tmdbId: id, // keep the ID so we can link back to TMDB later if needed
-    source: 'tmdb', // lets us tell apart TMDB vs manual content
+    tmdbId: id,
+    source: 'tmdb',
   };
 }
 
@@ -51,14 +56,20 @@ export async function fetchMovie(id) {
   const res = await fetch(`${BASE_URL}/movie/${id}?api_key=${API_KEY}`, options);
   const data = await res.json();
 
+  // TMDB returns { success: false, status_message: "..." } on errors
+  if (!res.ok || data.success === false) {
+    console.error(`Failed to fetch movie ${id}:`, data.status_message ?? res.status);
+    return null;
+  }
+
   return {
     title: data.title,
     slug: data.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
     type: 'Movie',
     year: new Date(data.release_date).getFullYear(),
     country: getCountryName(data.production_countries?.[0]?.iso_3166_1) ?? 'Unknown',
-    platform: 'Unknown', // movies don't have a network, you can override manually
-    status: 'Ended', // movies are always "complete"
+    platform: 'Unknown',
+    status: 'Ended',
     genre: data.genres?.map(g => g.name) ?? [],
     image: data.poster_path ? `${IMAGE_BASE}${data.poster_path}` : null,
     description: data.overview,
@@ -74,13 +85,13 @@ export async function fetchShows(ids) {
   // Promise.all runs all the fetches at the same time instead of one by one
   // This is much faster with many items
   const results = await Promise.all(ids.map(id => fetchShow(id)));
-  return results;
+  return results.filter(Boolean); // filters out any null results from failed fetches
 }
 
 // ---- FETCH MULTIPLE MOVIES AT ONCE ----
 export async function fetchMovies(ids) {
   const results = await Promise.all(ids.map(id => fetchMovie(id)));
-  return results;
+  return results.filter(Boolean); // filters out any null results from failed fetches
 }
 
 // Maps ISO country codes to full names

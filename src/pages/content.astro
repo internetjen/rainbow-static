@@ -21,7 +21,6 @@ const countries = [...new Set(content.map(item => item.country))].sort();
 const platforms = [...new Set(content.map(item => item.platform))].sort();
 const statuses = [...new Set(content.map(item => item.status))].sort();
 const genres = [...new Set(content.flatMap(item => item.genre))].sort();
-
 ---
 
 <BaseLayout title="All Content — Rainbow Static">
@@ -116,85 +115,88 @@ const genres = [...new Set(content.flatMap(item => item.genre))].sort();
 
   </div>
 
-
   <script>
-  // ---- GRAB ELEMENTS ----
-  // Get all checkboxes, all cards, the grid, and the "no results" message
-  const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-  const cards = document.querySelectorAll('#content-grid .card');
-  const clearBtn = document.getElementById('clear-filters');
-  const noResults = document.getElementById('no-results');
+    // ---- GRAB ELEMENTS ----
+    // Get all checkboxes, all cards, the grid, and the "no results" message
+    const checkboxes = document.querySelectorAll<HTMLInputElement>('input[type="checkbox"]');
+    const cards = document.querySelectorAll<HTMLElement>('#content-grid .card');
+    const clearBtn = document.getElementById('clear-filters');
+    const noResults = document.getElementById('no-results');
 
-  // ---- CORE FILTER FUNCTION ----
-  // Runs every time a checkbox is checked or unchecked
-  function applyFilters() {
+    // ---- CORE FILTER FUNCTION ----
+    // Runs every time a checkbox is checked or unchecked
+    function applyFilters() {
 
-    // Build an object of active filters grouped by category
-    // Example result: { type: ["Series"], country: ["Thailand", "South Korea"] }
-    const active = {};
+      // Build an object of active filters grouped by category
+      // Example result: { type: ["Series"], country: ["Thailand", "South Korea"] }
+      const active: Record<string, string[]> = {};
 
-    checkboxes.forEach(checkbox => {
-      if (checkbox.checked) {
-        const category = checkbox.dataset.filter; // e.g. "type", "country"
-        const value = checkbox.value;             // e.g. "Series", "Thailand"
+      checkboxes.forEach(checkbox => {
+        if (checkbox.checked) {
+          const category = checkbox.dataset.filter; // e.g. "type", "country"
+          const value = checkbox.value;             // e.g. "Series", "Thailand"
 
-        // If this category doesn't exist in active yet, create an empty array
-        if (!active[category]) active[category] = [];
-
-        // Add this value to that category's array
-        active[category].push(value);
-      }
-    });
-
-    // ---- SHOW/HIDE EACH CARD ----
-    let visibleCount = 0;
-
-    cards.forEach(card => {
-      const matches = Object.entries(active).every(([category, selectedValues]) => {
-        // Get this card's value for the current category
-        // e.g. card.dataset.country = "Thailand"
-        const cardValue = card.dataset[category] || '';
-
-        // Genre is stored as a comma-separated string: "Romance,Drama"
-        // So we split it back into an array to check membership
-        const cardValues = cardValue.split(',');
-
-        // Within the same category, OR logic:
-        // at least one of the selected values must match the card
-        return selectedValues.some(val => cardValues.includes(val));
+          // Guard: only proceed if category is defined
+          if (category) {
+            // If this category doesn't exist in active yet, create an empty array
+            if (!active[category]) active[category] = [];
+            // Add this value to that category's array
+            active[category].push(value);
+          }
+        }
       });
 
-      // If no filters are active at all (active is empty), show everything
-      const noFiltersActive = Object.keys(active).length === 0;
+      // ---- SHOW/HIDE EACH CARD ----
+      let visibleCount = 0;
 
-      if (noFiltersActive || matches) {
-        card.style.display = '';  // show — empty string restores default display
-        visibleCount++;
-      } else {
-        card.style.display = 'none';  // hide
+      cards.forEach(card => {
+        const matches = Object.entries(active).every(([category, selectedValues]) => {
+          // Get this card's value for the current category
+          // e.g. card.dataset.country = "Thailand"
+          const cardValue = card.dataset[category] || '';
+
+          // Genre is stored as a comma-separated string: "Romance,Drama"
+          // So we split it back into an array to check membership
+          const cardValues = cardValue.split(',');
+
+          // Within the same category, OR logic:
+          // at least one of the selected values must match the card
+          return selectedValues.some((val: string) => cardValues.includes(val));
+        });
+
+        // If no filters are active at all (active is empty), show everything
+        const noFiltersActive = Object.keys(active).length === 0;
+
+        if (noFiltersActive || matches) {
+          card.style.display = '';  // show — empty string restores default display
+          visibleCount++;
+        } else {
+          card.style.display = 'none';  // hide
+        }
+      });
+
+      // Show "no results" message if everything is hidden
+      if (noResults) {
+        noResults.style.display = visibleCount === 0 ? 'block' : 'none';
       }
-    });
+    }
 
-    // Show "no results" message if everything is hidden
-    noResults.style.display = visibleCount === 0 ? 'block' : 'none';
-  }
-
-  // ---- LISTEN FOR CHECKBOX CHANGES ----
-  // Every time any checkbox is toggled, re-run the filter
-  checkboxes.forEach(checkbox => {
-    checkbox.addEventListener('change', applyFilters);
-  });
-
-  // ---- CLEAR FILTERS BUTTON ----
-  clearBtn.addEventListener('click', () => {
-    // Uncheck every checkbox
+    // ---- LISTEN FOR CHECKBOX CHANGES ----
+    // Every time any checkbox is toggled, re-run the filter
     checkboxes.forEach(checkbox => {
-      checkbox.checked = false;
+      checkbox.addEventListener('change', applyFilters);
     });
-    // Re-run filter — with nothing checked, everything shows
-    applyFilters();
-  });
-</script>
+
+    // ---- CLEAR FILTERS BUTTON ----
+    clearBtn?.addEventListener('click', () => {
+      // Uncheck every checkbox
+      checkboxes.forEach(checkbox => {
+        checkbox.checked = false;
+      });
+      // Re-run filter — with nothing checked, everything shows
+      applyFilters();
+    });
+  </script>
 
 </BaseLayout>
 
