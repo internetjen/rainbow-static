@@ -1,21 +1,21 @@
 ---
-// content.astro — the All Content page
+// index.astro — the All Content page
 
-import BaseLayout from '../layouts/BaseLayout.astro';
-import ContentCard from '../components/ContentCard.astro';
-import { tmdbShowIds, tmdbMovieIds, manualContent } from '../data/content.js';
-import { fetchShows, fetchMovies } from '../data/tmdb.js';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ContentCard from '../../components/ContentCard.astro';
+import { tmdbSeriesIds, tmdbMovieIds, manualContent } from '../../data/content.js';
+import { fetchSeriesList, fetchMovies } from '../../data/tmdb.js';
 
 // Fetch all TMDB content at build time
 // This runs on the server when Astro builds the page — not in the browser
-const tmdbShows = await fetchShows(tmdbShowIds);
+const tmdbSeries = await fetchSeriesList(tmdbSeriesIds);
 const tmdbMovies = await fetchMovies(tmdbMovieIds);
 
 // Merge all content into one array
 // TMDB content comes first, manual content fills in the rest
-const content = [...tmdbShows, ...tmdbMovies, ...manualContent];
+const content = [...tmdbSeries, ...tmdbMovies, ...manualContent];
 
-// Build filter options dynamically from the merged array — same as before
+// Build filter options dynamically from the merged array
 const types = [...new Set(content.map(item => item.type))].sort();
 const countries = [...new Set(content.map(item => item.country))].sort();
 const platforms = [...new Set(content.map(item => item.platform))].sort();
@@ -38,13 +38,7 @@ const genres = [...new Set(content.flatMap(item => item.genre))].sort();
     <!-- ---- SIDEBAR ---- -->
     <aside class="sidebar">
 
-      <!-- Clear all filters button -->
-      <!-- id="clear-filters" lets JavaScript find it easily -->
       <button id="clear-filters">Clear Filters</button>
-
-      <!-- Each filter group follows the same pattern:
-           a heading, then a list of checkboxes.
-           data-filter="fieldname" tells our script which data attribute to check -->
 
       <div class="filter-group">
         <h3>Type</h3>
@@ -99,7 +93,6 @@ const genres = [...new Set(content.flatMap(item => item.genre))].sort();
     </aside>
 
     <!-- ---- CARD GRID ---- -->
-    <!-- id="content-grid" lets JavaScript find all the cards inside -->
     <div class="grid-wrapper">
       <div class="grid" id="content-grid">
         {content.map((item) => (
@@ -107,7 +100,6 @@ const genres = [...new Set(content.flatMap(item => item.genre))].sort();
         ))}
       </div>
 
-      <!-- Shown when no cards match the active filters -->
       <p class="no-results" id="no-results" style="display: none;">
         No results match your filters. Try clearing some.
       </p>
@@ -116,84 +108,58 @@ const genres = [...new Set(content.flatMap(item => item.genre))].sort();
   </div>
 
   <script>
-    // ---- GRAB ELEMENTS ----
-    // Get all checkboxes, all cards, the grid, and the "no results" message
     const checkboxes = document.querySelectorAll<HTMLInputElement>('input[type="checkbox"]');
     const cards = document.querySelectorAll<HTMLElement>('#content-grid .card');
     const clearBtn = document.getElementById('clear-filters');
     const noResults = document.getElementById('no-results');
 
-    // ---- CORE FILTER FUNCTION ----
-    // Runs every time a checkbox is checked or unchecked
     function applyFilters() {
-
-      // Build an object of active filters grouped by category
-      // Example result: { type: ["Series"], country: ["Thailand", "South Korea"] }
       const active: Record<string, string[]> = {};
 
       checkboxes.forEach(checkbox => {
         if (checkbox.checked) {
-          const category = checkbox.dataset.filter; // e.g. "type", "country"
-          const value = checkbox.value;             // e.g. "Series", "Thailand"
+          const category = checkbox.dataset.filter;
+          const value = checkbox.value;
 
-          // Guard: only proceed if category is defined
           if (category) {
-            // If this category doesn't exist in active yet, create an empty array
             if (!active[category]) active[category] = [];
-            // Add this value to that category's array
             active[category].push(value);
           }
         }
       });
 
-      // ---- SHOW/HIDE EACH CARD ----
       let visibleCount = 0;
 
       cards.forEach(card => {
         const matches = Object.entries(active).every(([category, selectedValues]) => {
-          // Get this card's value for the current category
-          // e.g. card.dataset.country = "Thailand"
           const cardValue = card.dataset[category] || '';
-
-          // Genre is stored as a comma-separated string: "Romance,Drama"
-          // So we split it back into an array to check membership
           const cardValues = cardValue.split(',');
-
-          // Within the same category, OR logic:
-          // at least one of the selected values must match the card
           return selectedValues.some((val: string) => cardValues.includes(val));
         });
 
-        // If no filters are active at all (active is empty), show everything
         const noFiltersActive = Object.keys(active).length === 0;
 
         if (noFiltersActive || matches) {
-          card.style.display = '';  // show — empty string restores default display
+          card.style.display = '';
           visibleCount++;
         } else {
-          card.style.display = 'none';  // hide
+          card.style.display = 'none';
         }
       });
 
-      // Show "no results" message if everything is hidden
       if (noResults) {
         noResults.style.display = visibleCount === 0 ? 'block' : 'none';
       }
     }
 
-    // ---- LISTEN FOR CHECKBOX CHANGES ----
-    // Every time any checkbox is toggled, re-run the filter
     checkboxes.forEach(checkbox => {
       checkbox.addEventListener('change', applyFilters);
     });
 
-    // ---- CLEAR FILTERS BUTTON ----
     clearBtn?.addEventListener('click', () => {
-      // Uncheck every checkbox
       checkboxes.forEach(checkbox => {
         checkbox.checked = false;
       });
-      // Re-run filter — with nothing checked, everything shows
       applyFilters();
     });
   </script>
@@ -207,15 +173,17 @@ const genres = [...new Set(content.flatMap(item => item.genre))].sort();
   }
 
   .page-header-content {
-  max-width: 1000px;
-   margin: 0 auto;
-   padding: 2rem 0;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem 0;
   }
 
   .page-header-content h1 {
     font-size: 2rem;
     font-weight: 800;
-    color: var(--color-bg); /* Light text on dark background */
+    color: var(--color-bg);
+    font-family: var(--font-heading); /* Use the display font for the header */
+
   }
 
   .page-header-content p {
@@ -224,24 +192,20 @@ const genres = [...new Set(content.flatMap(item => item.genre))].sort();
     color: #aaaaaa;
   }
 
-  /* Two-column layout — sidebar left, grid right */
   .content-layout {
     display: grid;
-    /* 220px for sidebar, rest for grid */
     grid-template-columns: 220px 1fr;
     gap: 2rem;
     padding: 2rem 0;
-    align-items: start; /* sidebar doesn't stretch to full height */
+    align-items: start;
   }
 
-  /* Sidebar stacks filter groups vertically */
   .sidebar {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
-    /* Sticks to top of viewport when scrolling */
     position: sticky;
-    top: 88px; /* clears the navbar height */
+    top: 88px;
   }
 
   #clear-filters {
@@ -262,7 +226,6 @@ const genres = [...new Set(content.flatMap(item => item.genre))].sort();
     color: var(--color-accent);
   }
 
-  /* Each filter group (Type, Country, etc.) */
   .filter-group {
     display: flex;
     flex-direction: column;
@@ -279,7 +242,6 @@ const genres = [...new Set(content.flatMap(item => item.genre))].sort();
     margin-bottom: 0.25rem;
   }
 
-  /* Each checkbox + label row */
   .filter-group label {
     display: flex;
     align-items: center;
@@ -290,13 +252,12 @@ const genres = [...new Set(content.flatMap(item => item.genre))].sort();
   }
 
   .filter-group input[type="checkbox"] {
-    accent-color: var(--color-accent); /* makes the checkbox pink when checked */
+    accent-color: var(--color-accent);
     width: 14px;
     height: 14px;
     cursor: pointer;
   }
 
-  /* Card grid */
   .grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -309,14 +270,13 @@ const genres = [...new Set(content.flatMap(item => item.genre))].sort();
     padding: 2rem 0;
   }
 
-  /* On mobile, stack sidebar above grid */
   @media (max-width: 768px) {
     .content-layout {
       grid-template-columns: 1fr;
     }
 
     .sidebar {
-      position: static; /* unstick on mobile */
+      position: static;
       flex-direction: row;
       flex-wrap: wrap;
       gap: 1rem;

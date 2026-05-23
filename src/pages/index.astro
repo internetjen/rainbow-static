@@ -1,48 +1,33 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/Hero.astro';
-import ContentCard from '../components/ContentCard.astro';
-import { manualContent } from '../data/content.js';
-
-const featuredContent = manualContent.slice(0, 3);
+import FeaturedContent from '../components/FeaturedContent.astro';
 ---
 
-<BaseLayout title="Rainbow Static — WLW Shows">
+<BaseLayout title="Rainbow Static — WLW Content Database">
 
-  <!-- slot="hero" tells BaseLayout to place this OUTSIDE the centered wrapper -->
-  <!-- so it stays full-bleed edge to edge -->
   <Hero slot="hero" />
 
-  <!-- Everything below goes into the default slot, inside .page-wrapper -->
-  <section class="featured">
-    <h2 class="section-title">Featured Content</h2>
-    <div class="grid">
-      {featuredContent.map((item) => (
-        <ContentCard {...item} />
-      ))}
-    </div>
-  </section>
+  <FeaturedContent />
 
 </BaseLayout>
 
 <style>
-
- .featured {
-    padding: 3rem 0; /* this was missing — adds space above and below the section */
+  .featured {
+    padding: 3rem 0;
   }
-.section-title {
+
+  .section-title {
     font-size: 1.5rem;
     margin-bottom: 1.5rem;
     color: #1a1a1a;
     padding-left: 1rem;
     border-left: 4px solid #ff69b4;
-    border-radius: 0;
   }
 
-   .grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.5rem;
-}
-
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
 </style>

@@ -1,0 +1,47 @@
+---
+// FeaturedContent.astro — curated featured content for the homepage
+
+import ContentCard from './ContentCard.astro';
+import { tmdbSeriesIds, tmdbMovieIds, manualContent } from '../data/content.js';
+import { fetchSeriesList, fetchMovies } from '../data/tmdb.js';
+
+// Fetch and merge all content
+const tmdbSeries = await fetchSeriesList(tmdbSeriesIds);
+const tmdbMovies = await fetchMovies(tmdbMovieIds);
+const allContent = [...tmdbSeries, ...tmdbMovies, ...manualContent];
+
+// Hand-pick featured items by title
+const featuredTitles = ['ClaireBell', 'Pluribus', 'Dirty Computer'];
+const featured = featuredTitles
+  .map(title => allContent.find(item => item.title === title))
+  .filter(Boolean);
+---
+
+<section class="featured">
+  <h2 class="section-title">Featured Content</h2>
+  <div class="grid">
+    {featured.map((item) => (
+      <ContentCard {...item} />
+    ))}
+  </div>
+</section>
+
+<style>
+  .featured {
+    padding: 3rem 0;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: #1a1a1a;
+    padding-left: 1rem;
+    border-left: 4px solid #ff69b4;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+</style>

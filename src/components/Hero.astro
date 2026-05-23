@@ -26,7 +26,7 @@
   <!-- The actual text content, sits on top of all the background layers -->
   <div class="hero-content">
     <h1>Rainbow Static</h1>
-    <p class="tagline">Your one stop shop for WLW content</p>
+    <p class="tagline">A WLW content library</p>
     <a href="/content" class="cta-button">Browse All Content</a>
   </div>
 </section>
@@ -122,7 +122,7 @@
   }
 
   .hero-content h1 {
-    font-family: 'Unbounded', sans-serif;  /* The chunky display font we imported */
+    font-family: var(--font-hero);  /* The chunky display font we imported */
     font-size: clamp(3rem, 8vw, 6rem);    /* Fluid sizing: min 3rem, scales with viewport, max 6rem */
     font-weight: 900;
     color: #ffffff;
@@ -135,11 +135,11 @@
   }
 
   .tagline {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: clamp(1rem, 2.5vw, 1.2rem);
+    font-family: var(--font-hero);
+    font-size: clamp(1rem, 2.5vw, 1.1rem);
     color: rgba(255, 255, 255, 0.9);
     text-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
-    letter-spacing: 0.02em;
+    letter-spacing: 0.05em;
   }
 
   .cta-button {
