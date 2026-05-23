@@ -28,7 +28,7 @@ const genres = [...new Set(content.flatMap(item => item.genre))].sort();
   <div class="page-header" slot="header">
     <div class="page-header-content">
       <h1>All Content</h1>
-      <p>{content.length} items and counting</p>
+      <p>{content.length} items</p>
     </div>
   </div>
 
@@ -202,18 +202,20 @@ const genres = [...new Set(content.flatMap(item => item.genre))].sort();
 
 <style>
   .page-header {
-    background-color: #111111;
-    border-bottom: 1px solid #222;
+    background-color: var(--color-text);
+    border-bottom: 1px solid var(--color-border);
   }
 
   .page-header-content {
-    padding: 2rem 0;
+  max-width: 1000px;
+   margin: 0 auto;
+   padding: 2rem 0;
   }
 
   .page-header-content h1 {
     font-size: 2rem;
     font-weight: 800;
-    color: #ffffff;
+    color: var(--color-bg); /* Light text on dark background */
   }
 
   .page-header-content p {
