@@ -19,8 +19,10 @@ const content = [...tmdbSeries, ...tmdbMovies, ...manualContent];
 const types = [...new Set(content.map(item => item.type))].sort();
 const countries = [...new Set(content.map(item => item.country))].sort();
 const platforms = [...new Set(content.map(item => item.platform))].sort();
-const statuses = [...new Set(content.map(item => item.status))].sort();
+const statuses = [...new Set(content.map(item => item.status).filter(Boolean))].sort();
 const genres = [...new Set(content.flatMap(item => item.genre))].sort();
+
+
 ---
 
 <BaseLayout title="All Content — Rainbow Static">
@@ -36,61 +38,74 @@ const genres = [...new Set(content.flatMap(item => item.genre))].sort();
   <div class="content-layout">
 
     <!-- ---- SIDEBAR ---- -->
-    <aside class="sidebar">
+<!-- ---- SIDEBAR ---- -->
+<aside class="sidebar">
+  <button id="filter-toggle" class="filter-toggle">
+    <span>Filters</span>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+  </button>
 
-      <button id="clear-filters">Clear Filters</button>
+  <div class="filter-drawer" id="filter-drawer">
+    <div class="drawer-header">
+      <span>Filters</span>
+      <button id="clear-filters">Clear All</button>
+    </div>
 
-      <div class="filter-group">
-        <h3>Type</h3>
+    <!-- TYPE — pills -->
+    <div class="filter-group">
+      <h3>Type</h3>
+      <div class="pill-group">
         {types.map(type => (
-          <label>
-            <input type="checkbox" data-filter="type" value={type} />
-            {type}
-          </label>
+          <button class="pill" data-filter="type" data-value={type}>{type}</button>
         ))}
       </div>
+    </div>
 
-      <div class="filter-group">
-        <h3>Status</h3>
+    <!-- STATUS — pills, hidden until Series selected -->
+    <div class="filter-group" data-group="status" id="status-group">
+      <h3>Status</h3>
+      <div class="pill-group">
         {statuses.map(status => (
-          <label>
-            <input type="checkbox" data-filter="status" value={status} />
-            {status}
-          </label>
+          <button class="pill" data-filter="status" data-value={status}>{status}</button>
         ))}
       </div>
+    </div>
 
-      <div class="filter-group">
+    <!-- GENRE — accordion -->
+    <div class="filter-group accordion">
+      <button class="accordion-trigger">
         <h3>Genre</h3>
-        {genres.map(genre => (
-          <label>
-            <input type="checkbox" data-filter="genre" value={genre} />
-            {genre}
-          </label>
-        ))}
+        <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="accordion-content">
+        <div class="pill-group">
+          {genres.map(genre => (
+            <button class="pill" data-filter="genre" data-value={genre}>{genre}</button>
+          ))}
+        </div>
       </div>
+    </div>
 
-      <div class="filter-group">
+    <!-- COUNTRY — accordion -->
+    <div class="filter-group accordion">
+      <button class="accordion-trigger">
         <h3>Country</h3>
-        {countries.map(country => (
-          <label>
-            <input type="checkbox" data-filter="country" value={country} />
-            {country}
-          </label>
-        ))}
+        <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="accordion-content">
+        <div class="pill-group">
+          {countries.map(country => (
+            <button class="pill" data-filter="country" data-value={country}>{country}</button>
+          ))}
+        </div>
       </div>
+    </div>
 
-      <div class="filter-group">
-        <h3>Platform</h3>
-        {platforms.map(platform => (
-          <label>
-            <input type="checkbox" data-filter="platform" value={platform} />
-            {platform}
-          </label>
-        ))}
-      </div>
+  </div>
 
-    </aside>
+  <!-- Mobile overlay -->
+  <div class="drawer-overlay" id="drawer-overlay"></div>
+</aside>
 
     <!-- ---- CARD GRID ---- -->
     <div class="grid-wrapper">
@@ -107,62 +122,111 @@ const genres = [...new Set(content.flatMap(item => item.genre))].sort();
 
   </div>
 
-  <script>
-    const checkboxes = document.querySelectorAll<HTMLInputElement>('input[type="checkbox"]');
-    const cards = document.querySelectorAll<HTMLElement>('#content-grid .card');
-    const clearBtn = document.getElementById('clear-filters');
-    const noResults = document.getElementById('no-results');
+<script>
+  const pills = document.querySelectorAll<HTMLButtonElement>('.pill');
+  const cards = document.querySelectorAll<HTMLElement>('#content-grid .card');
+  const clearBtn = document.getElementById('clear-filters');
+  const noResults = document.getElementById('no-results');
+  const filterToggle = document.getElementById('filter-toggle');
+  const filterDrawer = document.getElementById('filter-drawer');
+  const drawerOverlay = document.getElementById('drawer-overlay');
+  const statusGroup = document.getElementById('status-group');
 
-    function applyFilters() {
-      const active: Record<string, string[]> = {};
+  // Active filters state
+  const active: Record<string, string[]> = {};
 
-      checkboxes.forEach(checkbox => {
-        if (checkbox.checked) {
-          const category = checkbox.dataset.filter;
-          const value = checkbox.value;
+  // Hide status by default
+  if (statusGroup) statusGroup.style.display = 'none';
 
-          if (category) {
-            if (!active[category]) active[category] = [];
-            active[category].push(value);
-          }
-        }
-      });
+  // Mobile drawer toggle
+  filterToggle?.addEventListener('click', () => {
+    filterDrawer?.classList.toggle('open');
+    drawerOverlay?.classList.toggle('open');
+    document.body.classList.toggle('drawer-open');
+  });
 
-      let visibleCount = 0;
+  drawerOverlay?.addEventListener('click', () => {
+    filterDrawer?.classList.remove('open');
+    drawerOverlay?.classList.remove('open');
+    document.body.classList.remove('drawer-open');
+  });
 
-      cards.forEach(card => {
-        const matches = Object.entries(active).every(([category, selectedValues]) => {
-          const cardValue = card.dataset[category] || '';
-          const cardValues = cardValue.split(',');
-          return selectedValues.some((val: string) => cardValues.includes(val));
-        });
-
-        const noFiltersActive = Object.keys(active).length === 0;
-
-        if (noFiltersActive || matches) {
-          card.style.display = '';
-          visibleCount++;
-        } else {
-          card.style.display = 'none';
-        }
-      });
-
-      if (noResults) {
-        noResults.style.display = visibleCount === 0 ? 'block' : 'none';
-      }
-    }
-
-    checkboxes.forEach(checkbox => {
-      checkbox.addEventListener('change', applyFilters);
+  // Accordion
+  document.querySelectorAll('.accordion-trigger').forEach(trigger => {
+    trigger.addEventListener('click', () => {
+      const accordion = trigger.closest('.accordion');
+      accordion?.classList.toggle('open');
     });
+  });
 
-    clearBtn?.addEventListener('click', () => {
-      checkboxes.forEach(checkbox => {
-        checkbox.checked = false;
-      });
+  // Pill toggle
+  pills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      const category = pill.dataset.filter!;
+      const value = pill.dataset.value!;
+
+      pill.classList.toggle('active');
+
+      if (!active[category]) active[category] = [];
+
+      if (pill.classList.contains('active')) {
+        active[category].push(value);
+      } else {
+        active[category] = active[category].filter(v => v !== value);
+        if (active[category].length === 0) delete active[category];
+      }
+
+      // Show/hide status group based on Series pill
+      if (category === 'type' && statusGroup) {
+        const seriesActive = active['type']?.includes('Series');
+        statusGroup.style.display = seriesActive ? 'flex' : 'none';
+        if (!seriesActive) {
+          // deactivate status pills
+          document.querySelectorAll<HTMLButtonElement>('.pill[data-filter="status"]').forEach(p => {
+            p.classList.remove('active');
+          });
+          delete active['status'];
+        }
+      }
+
       applyFilters();
     });
-  </script>
+  });
+
+  // Clear filters
+  clearBtn?.addEventListener('click', () => {
+    pills.forEach(pill => pill.classList.remove('active'));
+    Object.keys(active).forEach(key => delete active[key]);
+    if (statusGroup) statusGroup.style.display = 'none';
+    applyFilters();
+  });
+
+  function applyFilters() {
+    let visibleCount = 0;
+
+    cards.forEach(card => {
+      const matches = Object.entries(active).every(([category, selectedValues]) => {
+        if (category === 'status' && !card.dataset.status) return true;
+        const cardValue = card.dataset[category] || '';
+        const cardValues = cardValue.split(',');
+        return selectedValues.some(val => cardValues.includes(val));
+      });
+
+      const noFiltersActive = Object.keys(active).length === 0;
+
+      if (noFiltersActive || matches) {
+        card.style.display = '';
+        visibleCount++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    if (noResults) {
+      noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+    }
+  }
+</script>
 
 </BaseLayout>
 
@@ -175,15 +239,14 @@ const genres = [...new Set(content.flatMap(item => item.genre))].sort();
   .page-header-content {
     max-width: 1000px;
     margin: 0 auto;
-    padding: 2rem 0;
+    padding: 2rem;
   }
 
   .page-header-content h1 {
     font-size: 2rem;
     font-weight: 800;
     color: var(--color-bg);
-    font-family: var(--font-heading); /* Use the display font for the header */
-
+    font-family: var(--font-heading);
   }
 
   .page-header-content p {
@@ -200,32 +263,62 @@ const genres = [...new Set(content.flatMap(item => item.genre))].sort();
     align-items: start;
   }
 
+  /* ---- FILTER TOGGLE (mobile only) ---- */
+  .filter-toggle {
+    display: none;
+    align-items: center;
+    gap: 0.5rem;
+    background: none;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    font-family: var(--font-body);
+    color: var(--color-text);
+    cursor: pointer;
+    margin-bottom: 1rem;
+  }
+
+  /* ---- SIDEBAR / DRAWER ---- */
   .sidebar {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
     position: sticky;
     top: 88px;
   }
 
+  .filter-drawer {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .drawer-header {
+    display: none;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .drawer-header span {
+    font-weight: 700;
+    font-size: 1rem;
+  }
+
   #clear-filters {
     background: none;
-    border: 1px solid var(--color-border);
-    border-radius: 999px;
-    padding: 0.4rem 1rem;
+    border: none;
     font-size: 0.8rem;
     cursor: pointer;
-    color: var(--color-muted);
+    color: var(--color-accent);
     font-family: var(--font-body);
-    transition: all 0.2s;
-    width: fit-content;
+    padding: 0;
   }
 
   #clear-filters:hover {
-    border-color: var(--color-accent);
-    color: var(--color-accent);
+    text-decoration: underline;
   }
 
+  /* ---- FILTER GROUPS ---- */
   .filter-group {
     display: flex;
     flex-direction: column;
@@ -233,31 +326,86 @@ const genres = [...new Set(content.flatMap(item => item.genre))].sort();
   }
 
   .filter-group h3 {
-    font-family: var(--font-heading);
-    font-size: 0.75rem;
+    font-family: var(--font-body);
+    font-size: 0.72rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: var(--color-muted);
-    margin-bottom: 0.25rem;
+    margin: 0;
   }
 
-  .filter-group label {
+  /* ---- PILLS ---- */
+  .pill-group {
     display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.85rem;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .pill {
+    background: none;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    padding: 0.3rem 0.75rem;
+    font-size: 0.78rem;
+    font-family: var(--font-body);
     color: var(--color-text);
     cursor: pointer;
+    transition: all 0.15s;
   }
 
-  .filter-group input[type="checkbox"] {
-    accent-color: var(--color-accent);
-    width: 14px;
-    height: 14px;
+  .pill:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  .pill.active {
+    background-color: var(--color-accent);
+    border-color: var(--color-accent);
+    color: #fff;
+  }
+
+  /* ---- ACCORDION ---- */
+  .accordion-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: none;
+    border: none;
+    padding: 0;
     cursor: pointer;
+    width: 100%;
   }
 
+  .accordion-trigger h3 {
+    margin: 0;
+  }
+
+  .chevron {
+    transition: transform 0.2s;
+    color: var(--color-muted);
+    flex-shrink: 0;
+  }
+
+  .accordion.open .chevron {
+    transform: rotate(180deg);
+  }
+
+  .accordion-content {
+    display: none;
+    padding-top: 0.5rem;
+  }
+
+  .accordion.open .accordion-content {
+    display: block;
+  }
+
+  /* ---- OVERLAY ---- */
+  .drawer-overlay {
+    display: none;
+  }
+
+  /* ---- GRID ---- */
   .grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -270,20 +418,63 @@ const genres = [...new Set(content.flatMap(item => item.genre))].sort();
     padding: 2rem 0;
   }
 
+  /* ---- MOBILE ---- */
   @media (max-width: 768px) {
     .content-layout {
       grid-template-columns: 1fr;
     }
 
-    .sidebar {
-      position: static;
-      flex-direction: row;
-      flex-wrap: wrap;
-      gap: 1rem;
+    .filter-toggle {
+      display: flex;
     }
 
-    .filter-group {
-      min-width: 140px;
+    .sidebar {
+      position: static;
+    }
+
+    .filter-drawer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--color-bg);
+      border-top: 2px solid var(--color-text);
+      border-radius: 20px 20px 0 0;
+      padding: 1.5rem;
+      z-index: 200;
+      max-height: 80vh;
+      overflow-y: auto;
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+      gap: 1.5rem;
+    }
+
+    .filter-drawer.open {
+      transform: translateY(0);
+    }
+
+    .drawer-header {
+      display: flex;
+    }
+
+    .drawer-overlay {
+      display: block;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 199;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+
+    .drawer-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    body.drawer-open {
+      overflow: hidden;
     }
   }
 </style>

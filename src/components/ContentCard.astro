@@ -15,7 +15,7 @@ const { title, year, country, platform, status, image, slug, type, genre } = Ast
   <div class="card-info">
     <h2>{title}</h2>
     <p class="meta">{year} · {country}</p>
-    <span class="badge">{status}</span>
+  {status && <span class="badge">{status}</span>}
   </div>
 </a>
 
@@ -47,14 +47,16 @@ const { title, year, country, platform, status, image, slug, type, genre } = Ast
     padding: 1rem;
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
+    gap: 0.15rem;
   }
 
   h2 {
     font-family: var(--font-heading);
-    font-size: 0.95rem;
+    font-size: 1rem;
     font-weight: 700;
     color: var(--color-text);
+    margin: 0;
+
   }
 
   .meta {
