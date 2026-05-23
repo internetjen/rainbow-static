@@ -104,6 +104,14 @@ const COUNTRY_NAMES = {
   CN: 'China',
   TW: 'Taiwan',
   PH: 'Philippines',
+  BR: 'Brazil',
+  SE: 'Sweden',
+  DE: 'Germany',
+  IE: 'Ireland',
+  AU: 'Australia',
+  CA: 'Canada',
+  ES: 'Spain',
+  MX: 'Mexico',
 };
 
 // Helper function — converts "TH" to "Thailand"
