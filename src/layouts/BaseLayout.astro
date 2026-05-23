@@ -1,6 +1,8 @@
 ---
 const { title } = Astro.props;
 import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+
 ---
 
 <!doctype html>
@@ -36,9 +38,8 @@ import Navbar from '../components/Navbar.astro';
       <slot />
     </main>
 
-    <footer>
-      <p>© internetjen - 2026</p>
-    </footer>
+<Footer />
+
   </body>
 </html>
 
