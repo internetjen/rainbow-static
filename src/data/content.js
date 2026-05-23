@@ -14,6 +14,16 @@ export const tmdbSeriesIds = [
   282471, // ClaireBell
   155513, // GAP The Series
   225171, // Pluribus
+  218672, // Show Me Love
+  238754, // The Loyal Pin
+  257788, // Affair
+  286069, // 4 Elements: The Air
+  287114, // 4 Elements: The Water
+  287115, // 4 Elements: The Earth
+  285992, // 4 Elements: The Fire
+  284488, // Harmony Secret
+
+
 ];
 
 export const tmdbMovieIds = [
